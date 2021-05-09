@@ -25,7 +25,9 @@ class AccountAgedTrialBalance(models.TransientModel):
         res = {}
         data = self.pre_print_report(data)
         data['form'].update(self.read(['period_length'])[0])
+        data['form'].update(self.read(['partner_id'])[0])
         period_length = data['form']['period_length']
+        partner_id = data['form']['partner_id']
         if period_length <= 0:
             raise UserError(_('You must set a period length greater than 0.'))
         if not data['form']['date_from']:

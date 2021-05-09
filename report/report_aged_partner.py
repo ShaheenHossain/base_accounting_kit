@@ -35,7 +35,7 @@ class ReportAgedPartnerBalance(models.AbstractModel):
     _description = 'Aged Partner Balance Report'
 
     def _get_partner_move_lines(self, account_type, date_from, target_move,
-                                period_length):
+                                period_length,partner_id):
         # This method can receive the context key 'include_nullified_amount' {Boolean}
         # Do an invoice and a payment and unreconcile. The amount will be nullified
         # By default, the partner wouldn't appear in this report.
@@ -86,18 +86,23 @@ class ReportAgedPartnerBalance(models.AbstractModel):
         if reconciled_after_date:
             reconciliation_clause = '(l.reconciled IS FALSE OR l.id IN %s)'
             arg_list += (tuple(reconciled_after_date),)
-        arg_list += (date_from, tuple(company_ids))
-        query = '''
-            SELECT DISTINCT l.partner_id, UPPER(res_partner.name)
-            FROM account_move_line AS l left join res_partner on l.partner_id = res_partner.id, account_account, account_move am
-            WHERE (l.account_id = account_account.id)
+
+        where_clouse = '''WHERE (l.account_id = account_account.id)
                 AND (l.move_id = am.id)
                 AND (am.state IN %s)
                 AND (account_account.internal_type IN %s)
                 AND ''' + reconciliation_clause + '''
                 AND (l.date <= %s)
-                AND l.company_id IN %s
-            ORDER BY UPPER(res_partner.name)'''
+                AND l.company_id IN %s'''
+        if len(tuple(partner_id))>0:
+            arg_list += (date_from, tuple(company_ids),tuple(partner_id))
+            where_clouse += ''' AND l.partner_id IN %s'''
+        else:
+            arg_list += (date_from, tuple(company_ids))
+        query = '''
+            SELECT DISTINCT l.partner_id, UPPER(res_partner.name)
+            FROM account_move_line AS l left join res_partner on l.partner_id = res_partner.id, account_account, account_move am
+            ''' + where_clouse +''' ORDER BY UPPER(res_partner.name)'''
         cr.execute(query, arg_list)
 
         partners = cr.dictfetchall()
@@ -291,7 +296,10 @@ class ReportAgedPartnerBalance(models.AbstractModel):
                                                                date_from,
                                                                target_move,
                                                                data['form'][
-                                                                   'period_length'])
+                                                                   'period_length'],
+                                                                data['form'][
+                                                                    'partner_id']
+                                                               )
         return {
             'doc_ids': self.ids,
             'doc_model': model,
