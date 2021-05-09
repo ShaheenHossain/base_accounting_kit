@@ -37,11 +37,12 @@
                             </p>
                         </div>
                     </div>
-
-                    <table class="table table-sm table-reports">
+                    <t t-foreach="get_partner_lines" t-as="partner">
+                        <span t-esc="partner['name']"/>
+                        <table class="table table-sm table-reports">
                         <thead>
                             <tr>
-                                <th>Partners</th>
+<!--                                <th></th>-->
                                 <th class="text-right"><span>Not due</span></th>
 
                                 <th class="text-right"><span t-esc="data['4']['name']"/></th>
@@ -51,7 +52,7 @@
                                 <th class="text-right"><span t-esc="data['0']['name']"/></th>
                                 <th class="text-right">Total</th>
                             </tr>
-                            <tr t-if="get_partner_lines">
+                            <!--<tr t-if="get_partner_lines">
                                 <th>Account Total</th>
                                 <th class="text-right"><span t-esc="get_direction[6]" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/></th>
                                 <th class="text-right"><span t-esc="get_direction[4]" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/></th>
@@ -60,13 +61,13 @@
                                 <th class="text-right"><span t-esc="get_direction[1]" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/></th>
                                 <th class="text-right"><span t-esc="get_direction[0]" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/></th>
                                 <th class="text-right"><span t-esc="get_direction[5]" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/></th>
-                            </tr>
+                            </tr>-->
                         </thead>
                         <tbody>
-                            <tr t-foreach="get_partner_lines" t-as="partner">
-                                <td>
-                                    <span t-esc="partner['name']"/>
-                                </td>
+                            <tr >
+                                <!--<td>
+                                    &lt;!&ndash;<span t-esc="partner['name']"/>&ndash;&gt;
+                                </td>-->
                                 <td class="text-right">
                                     <span t-esc="partner['direction']" t-options="{'widget': 'monetary', 'display_currency': env.company.currency_id}"/>
                                 </td>
@@ -91,6 +92,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    </t>
                 </div>
             </t>
         </t>
